@@ -18,21 +18,6 @@ module Freshdesk
     def self.object_classes
       @object_classes ||= {
           'ticket' => Ticket
-          #'balance' => Balance,
-          #'balance_transaction' => BalanceTransaction,
-          #'charge' => Charge,
-          #'customer' => Customer,
-          #'invoiceitem' => InvoiceItem,
-          #'invoice' => Invoice,
-          #'plan' => Plan,
-          #'coupon' => Coupon,
-          #'event' => Event,
-          #'transfer' => Transfer,
-          #'recipient' => Recipient,
-          #'card' => Card,
-          #'subscription' => Subscription,
-          #'list' => ListObject,
-          #'application_fee' => ApplicationFee
       }
     end
 
@@ -41,7 +26,7 @@ module Freshdesk
       when Array
         resp.map { |i| convert_to_fresh_object(i, api_key) }
       when Hash
-        # Try converting to a known object class.  If none available, fall back to generic StripeObject
+        # Try converting to a known object class.  If none available, fall back to generic FreshObject
         object_classes.fetch(resp[:object], FreshObject).construct_from(resp, api_key)
       else
         resp

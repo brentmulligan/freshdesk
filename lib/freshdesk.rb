@@ -4,6 +4,7 @@ require 'set'
 require 'openssl'
 require 'rest_client'
 require 'json'
+require 'yaml'
 
 
 # Version
@@ -31,6 +32,7 @@ require 'freshdesk/errors/authentication_error'
 module Freshdesk
   @api_base = 'http://merchbro.freshdesk.com/'
 
+  #@api_key = ''
 
   class << self
     attr_accessor :api_key, :api_base, :api_version
@@ -45,17 +47,11 @@ module Freshdesk
 
     unless api_key ||= @api_key
       raise AuthenticationError.new('No API key provided. ' +
-                                        'Set your API key using "Stripe.api_key = <API-KEY>". ' +
-                                        'You can generate API keys from the Stripe web interface. ' +
-                                        'See https://stripe.com/api for details, or email support@stripe.com ' +
-                                        'if you have any questions.')
+                                    'Set your API key using "Freshdesk.api_key = <API-KEY>".')
     end
 
     if api_key =~ /\s/
-      raise AuthenticationError.new('Your API key is invalid, as it contains ' +
-                                        'whitespace. (HINT: You can double-check your API key from the ' +
-                                        'Stripe web interface. See https://stripe.com/api for details, or ' +
-                                        'email support@stripe.com if you have any questions.)')
+      raise AuthenticationError.new('Your API key is invalid, as it contains whitespace.')
     end
 
     params = Util.objects_to_ids(params)
@@ -135,8 +131,6 @@ module Freshdesk
       raise invalid_request_error error, rcode, rbody, error_obj
     when 401
       raise authentication_error error, rcode, rbody, error_obj
-    when 402
-      raise card_error error, rcode, rbody, error_obj
     else
       raise api_error error, rcode, rbody, error_obj
     end
@@ -156,10 +150,6 @@ module Freshdesk
     AuthenticationError.new(error[:message], rcode, rbody, error_obj)
   end
 
-  def self.card_error(error, rcode, rbody, error_obj)
-    CardError.new(error[:message], error[:param], error[:code], rcode, rbody, error_obj)
-  end
-
   def self.api_error(error, rcode, rbody, error_obj)
     APIError.new(error[:message], rcode, rbody, error_obj)
   end
@@ -167,19 +157,12 @@ module Freshdesk
   def self.handle_restclient_error(e)
     case e
     when RestClient::ServerBrokeConnection, RestClient::RequestTimeout
-      message = "Could not connect to Stripe (#{@api_base}). " +
+      message = "Could not connect to Freshdesk (#{@api_base}). " +
           "Please check your internet connection and try again. " +
-          "If this problem persists, you should check Stripe's service status at " +
-          "https://twitter.com/stripestatus, or let us know at support@stripe.com."
-
-    when SocketError
-      message = "Unexpected error communicating when trying to connect to Stripe. " +
-          "You may be seeing this message because your DNS is not working. " +
-          "To check, try running 'host stripe.com' from the command line."
+          "If this problem persists, you should check Freshdesk's service status."
 
     else
-      message = "Unexpected error communicating with Stripe. " +
-          "If this problem persists, let us know at support@stripe.com."
+      message = "Unexpected error communicating with Freshdesk. "
 
     end
 
@@ -218,13 +201,12 @@ module Freshdesk
     password = 'X'
 
     headers = {
-        :user_agent => "Freshdesk-ruby-json #{Freshdesk::VERSION}",
+        :user_agent => "Freshdesk-Ruby #{Freshdesk::VERSION}",
         :authorization => 'Basic ' + ["#{api_key}:#{password}"].pack('m').delete("\r\n"),
         :content_type => 'application/x-www-form-urlencoded'
     }
 
     headers[:freshdesk_version] = api_version if api_version
-
 
     begin
       headers.update(:x_freshdesk_client_user_agent => JSON.generate(user_agent))

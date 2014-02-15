@@ -175,7 +175,7 @@ module Freshdesk
         super
       rescue NoMethodError => e
         if @transient_values.include?(name)
-          raise NoMethodError.new(e.message + ".  HINT: The '#{name}' attribute was set in the past, however.  It was then wiped when refreshing the object with the result returned by Stripe's API, probably as a result of a save().  The attributes currently available on this object are: #{@values.keys.join(', ')}")
+          raise NoMethodError.new(e.message + ".  HINT: The '#{name}' attribute was set in the past, however.  It was then wiped when refreshing the object with the result returned by Freshbook's API, probably as a result of a save().  The attributes currently available on this object are: #{@values.keys.join(', ')}")
         else
           raise
         end

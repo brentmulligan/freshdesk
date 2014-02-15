@@ -11,7 +11,7 @@ module Freshdesk
         if values.length > 0
           values.delete(:id)
 
-          response, api_key = Freshdesk.request(:post, url, @api_key, values)
+          response, api_key = Freshdesk.request(:put, url, @api_key, values)
           refresh_from(response, api_key)
         end
         self
