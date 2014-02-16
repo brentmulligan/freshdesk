@@ -30,7 +30,7 @@ require 'freshdesk/errors/api_connection_error'
 require 'freshdesk/errors/authentication_error'
 
 module Freshdesk
-  @api_base = 'http://merchbro.freshdesk.com/'
+  #@api_base = ''
 
   #@api_key = ''
 
@@ -48,6 +48,11 @@ module Freshdesk
     unless api_key ||= @api_key
       raise AuthenticationError.new('No API key provided. ' +
                                     'Set your API key using "Freshdesk.api_key = <API-KEY>".')
+    end
+
+    unless api_base ||= @api_base
+      raise APIConnectionError.new( 'No API Base URL provided. ' +
+                                    'Set your Base URL using "Freshdesk.api_base = "http://youraccount.freshdesk.com" ".')
     end
 
     if api_key =~ /\s/

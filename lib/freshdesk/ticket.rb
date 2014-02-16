@@ -5,9 +5,18 @@ module Freshdesk
     include Freshdesk::APIOperations::Update
 
 
+    def create_note(note_body, is_private=nil)
+      is_private ||= true
+      params = { :helpdesk_note => { :body => note_body, :source => '2', :private => is_private } }
+
+      response, api_key = Freshdesk.request(:post, create_note_url, @api_key, params)
+      refresh_from(response, api_key)
+      self
+    end
+
     def create_tag(tag)
       params = { :name => tag }
-      response, api_key = Freshdesk.request(:post, add_tag_url, @api_key, params)
+      response, api_key = Freshdesk.request(:post, create_tag_url, @api_key, params)
       refresh_from(response, api_key)
       self
     end
@@ -24,7 +33,11 @@ module Freshdesk
 
     private
 
-    def add_tag_url
+    def create_note_url
+      url + '/notes'
+    end
+
+    def create_tag_url
       url + '/tag_uses'
     end
 

@@ -15,6 +15,7 @@ module Freshdesk
       unless id = self['id'] || self['helpdesk_ticket']['display_id'].to_s
         raise InvalidRequestError.new("Could not determine which URL to request: #{self.class} instance has invalid ID: #{id.inspect}", 'id')
       end
+      id = id.to_s
       "#{self.class.url}/#{CGI.escape(id)}"
     end
 
